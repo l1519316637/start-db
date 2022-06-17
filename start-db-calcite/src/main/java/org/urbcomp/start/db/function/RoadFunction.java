@@ -27,6 +27,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.urbcomp.start.db.algorithm.shortestpath.BiDijkstraShortestPath;
+import org.urbcomp.start.db.exception.AlgorithmExecuteException;
+import org.urbcomp.start.db.model.point.SpatialPoint;
+import org.urbcomp.start.db.model.roadnetwork.Path;
 import org.urbcomp.start.db.model.roadnetwork.RoadNetwork;
 import org.urbcomp.start.db.model.roadnetwork.RoadSegment;
 
@@ -39,8 +43,18 @@ import java.util.List;
  */
 public class RoadFunction {
 
+    @StartDBFunction("st_rn_shortestPath")
+    public Path st_rn_shortestPath(RoadNetwork roadNetwork, Point startPoint, Point endPoint)
+        throws AlgorithmExecuteException {
+        BiDijkstraShortestPath biDijkstraShortestPath = new BiDijkstraShortestPath(roadNetwork);
+        return biDijkstraShortestPath.findShortestPath(
+            new SpatialPoint(startPoint.getCoordinate()),
+            new SpatialPoint(endPoint.getCoordinate())
+        );
+    }
+
     @StartDBFunction("st_makeRoadNetwork")
-    public RoadNetwork st_makeRoadNetwork(List<RoadSegment> rsList) {
+    public RoadNetwork st_makeRoadNetwork(List<RoadSegment> rsList) throws JsonProcessingException {
         return new RoadNetwork(rsList);
     }
 
